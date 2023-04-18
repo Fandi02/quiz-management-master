@@ -1,0 +1,71 @@
+@inject IAlertService AlertService
+@inject NavigationManager NavigationManager
+@inject IQuizService QuizService
+
+<EditForm Model="@Quiz" OnValidSubmit="@OnValidSubmit">
+    <div class="mb-3">
+        <label class="form-label" for="QuizName">Name</label>
+        <InputText type="text" class="form-control" id="QuizName" @bind-Value="Quiz.Name" placeholder="Quiz Name" />
+        <div class="invalid-feedback">
+            <ValidationMessage For="@(() => Quiz.Name)" />
+        </div>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-end">
+        <button type="submit" class="btn btn-primary mx-3">Save</button>
+        <button type="button" class="btn btn-danger" @onclick="HandleDelete">Delete</button>
+    </div>
+</EditForm>
+
+<Modal @ref="deleteModal">
+    <Title>Delete Quiz</Title>
+
+    <Body>
+        <p>
+            Are you sure to delete this data?
+        </p>
+    </Body>
+
+    <Footer>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+            @onclick="() => deleteModal.Close()">
+            Close
+        </button>
+        <button type="button" class="btn btn-danger" @onclick="DeleteQuiz">Delete</button>
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter]
+    public Quiz Quiz { get; set; }
+
+    private Modal deleteModal { get; set; }
+
+    private async void OnValidSubmit()
+    {
+        AlertService.Clear();
+
+        try
+        {
+            await QuizService.UpdateQuiz(Quiz);
+            AlertService.Success("Quiz updated successfully");
+            NavigationManager.NavigateTo($"/quiz/{Quiz.Id}", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            AlertService.Error(ex.Message);
+        }
+    }
+
+    protected void HandleDelete()
+    {
+        deleteModal.Open();
+        NavigationManager.NavigateTo($"/", forceLoad: true);
+    }
+
+    protected async void DeleteQuiz()
+    {
+        await QuizService.DeleteQuiz(Quiz.Id);
+        StateHasChanged();
+    }
+}

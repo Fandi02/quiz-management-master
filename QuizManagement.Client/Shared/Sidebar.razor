@@ -1,0 +1,59 @@
+@inject IQuizService QuizService
+@inject NavigationManager NavigationManager
+
+<aside id="sidebar-wrapper">
+    <div class="sidebar-brand">
+        <a href="/">Quiz Management</a>
+    </div>
+    <div class="sidebar-brand sidebar-brand-sm">
+        <a href="/">St</a>
+    </div>
+    <ul class="sidebar-menu">
+        <li class="nav-item @(currentUrl == "/" ? "active" : "")">
+            <a class="nav-link" href="/"><i class="fas fa-home"></i> <span>Home</span></a>
+        </li>
+        <li class="nav-item @(currentUrl == "/user" ? "active" : "")">
+            <a class="nav-link" href="/user"><i class="fas fa-user"></i> <span>User</span></a>
+        </li>
+
+        <li class="menu-header">Quizzes</li>
+        @if (quizzes != null)
+        {
+            @foreach (var quiz in quizzes)
+            {
+                <li class="nav-item @(currentUrl == $"/quiz/{quiz.Id}" ? "active" : "")">
+                    <a class="nav-link" href="/quiz/@quiz.Id"><i class="fas fa-tasks"></i> <span>@quiz.Name</span></a>
+                </li>
+            }
+        }
+
+        <li class="nav-item @(currentUrl == "/quiz/new" ? "active" : "")">
+            <a class="nav-link" href="/quiz/new"><i class="fas fa-plus"></i> <span>Add Quiz</span></a>
+        </li>
+    </ul>
+</aside>
+
+@code {
+    protected List<Quiz> quizzes;
+    private string currentUrl = "/";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            quizzes = await QuizService.GetQuizzes();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+        NavigationManager.LocationChanged += LocationChanged;
+    }
+
+    void LocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "/");
+        StateHasChanged();
+    }
+}

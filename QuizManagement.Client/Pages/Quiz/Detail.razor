@@ -1,0 +1,108 @@
+@page "/quiz/{QuizId}"
+@attribute [Authorize]
+@inject IQuizService QuizService
+@inject IHttpService HttpService
+
+<PageTitle>Quiz</PageTitle>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Quiz Detail</h5>
+    </div>
+
+    <div class="card-body">
+        <QuizUpdateForm Quiz="@quiz" />
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Leaderboard</h5>
+    </div>
+
+    <div class="card-body">
+        @if (quiz.Questions != null)
+        {
+            <LeaderboardTable Leaderboards="@leaderboard" />
+        }
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Questions</h5>
+        <div class="d-flex items-center">
+            <label class="btn btn-info mx-2" style="display: block;">
+                <InputFile id="upload" OnChange="@LoadFiles" style="display: none;" />
+                Upload
+            </label>
+
+            <QuestionCreateForm QuizId="Int32.Parse(QuizId)" OnSuccess="Refetch" />
+        </div>
+    </div>
+
+    <div class="card-body">
+        @if (quiz.Questions != null)
+        {
+            <QuestionTable Questions="@quiz.Questions" OnStateChange="Refetch" />
+        }
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Players</h5>
+
+        <a href="@(HttpService.BaseURL() + $"api/quiz/{quiz.Id}/player/csv")">
+            <button class="btn btn-sm btn-info">Print</button>
+        </a>
+    </div>
+
+    <div class="card-body">
+        <PlayerTable QuizId="@quiz.Id" />
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string QuizId { get; set; } = "1";
+    protected Quiz quiz = new Quiz();
+    protected List<Leaderboard> leaderboard = new List<Leaderboard>();
+    private List<IBrowserFile> loadedFiles = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await fetch();
+    }
+
+    protected async void Refetch()
+    {
+        await fetch();
+        StateHasChanged();
+    }
+
+    private async Task fetch()
+    {
+        quiz = await QuizService.GetQuiz(Int32.Parse(QuizId));
+        leaderboard = await QuizService.GetLeaderboard(Int32.Parse(QuizId));
+    }
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        // Get the selected file
+        var file = e.File;
+
+        // Check if the file is null then return from the method
+        if (file == null)
+            return;
+
+        using (var stream = file.OpenReadStream(50000000))
+        {
+            var content = new StreamContent(stream);
+            FileStream fs = stream as FileStream;
+            Console.WriteLine(e.File.Name);
+            await HttpService.UploadFile($"/api/quiz/{quiz.Id}/upload", content, file.Name);
+            Refetch();
+        }
+    }
+}

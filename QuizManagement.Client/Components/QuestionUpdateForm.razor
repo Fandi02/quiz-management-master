@@ -1,0 +1,39 @@
+<div class="mb-3">
+    <label class="form-label" for="question">Question</label>
+    <InputTextArea id="question" class="form-control" placeholder="Fill question here!" aria-label="Fill question here!"
+        cols="3" @bind-Value="Question.Question"></InputTextArea>
+</div>
+
+<hr>
+
+@{
+    int i = 0;
+}
+@foreach (var answer in Question.Answers)
+{
+    <AnswerForm Index="i" Answer="answer" OnDelete="HandleAnswerDelete" />
+    i++;
+}
+
+<div class="d-flex align-items-center justify-content-end">
+    <button type="button" class="btn btn-sm btn-primary" @onclick="AddAnswer">
+        + Add Answer
+    </button>
+</div>
+
+@code {
+    [Parameter]
+    public QuestionDTO Question { get; set; }
+
+    protected void HandleAnswerDelete(int index)
+    {
+        Question.Answers.RemoveAt(index);
+        StateHasChanged();
+    }
+
+    protected void AddAnswer()
+    {
+        Question.Answers.Add(new AnswerDTO());
+        StateHasChanged();
+    }
+}

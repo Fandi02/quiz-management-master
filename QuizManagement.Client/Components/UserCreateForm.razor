@@ -1,0 +1,60 @@
+@inject IAlertService AlertService
+@inject IUserService UserService
+
+<button type="button" class="btn btn-sm btn-primary" @onclick="() => modal.Open()">
+    <span class="bx bx-plus"></span> Create new
+</button>
+
+<Modal @ref="modal">
+    <Title>Add User</Title>
+
+    <Body>
+        <div class="mb-3">
+            <label class="form-label" for="name">Name</label>
+            <InputText id="name" class="form-control" @bind-Value="User.Name" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="username">Username</label>
+            <InputText id="username" class="form-control" @bind-Value="User.Username" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="email">Email</label>
+            <InputText id="email" type="email" class="form-control" @bind-Value="User.Email" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="password">Password</label>
+            <InputText id="password" type="password" class="form-control" @bind-Value="User.Password" />
+        </div>
+    </Body>
+    <Footer>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" @onclick="() => modal.Close()">
+            Close
+        </button>
+        <button type="button" class="btn btn-primary" @onclick="HandleSubmit">Create</button>
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter]
+    public EventCallback OnSuccess { get; set; }
+    protected UserDTO User { get; set; } = new UserDTO();
+
+    private Modal modal { get; set; }
+
+    private async void HandleSubmit()
+    {
+        AlertService.Clear();
+
+        try
+        {
+            modal.Close();
+            await UserService.AddUser(User);
+            await OnSuccess.InvokeAsync();
+            AlertService.Success("Question created successfully");
+        }
+        catch (Exception ex)
+        {
+            AlertService.Error(ex.Message);
+        }
+    }
+}

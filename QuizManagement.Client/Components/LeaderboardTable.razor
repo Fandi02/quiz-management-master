@@ -1,0 +1,33 @@
+@inject IQuestionService QuestionService
+@inject IAlertService AlertService
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var i = 0;
+            }
+            @foreach (var leaderboard in Leaderboards)
+            {
+                <tr>
+                    <th scope="row">@(i+1)</th>
+                    <td>@leaderboard.Name</td>
+                    <td>@leaderboard.Score</td>
+                </tr>
+                i++;
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter]
+    public List<Leaderboard> Leaderboards { get; set; } = new List<Leaderboard>();
+}

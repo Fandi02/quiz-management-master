@@ -1,0 +1,112 @@
+@page "/user"
+@attribute [Authorize]
+@inject IUserService UserService
+@inject IAlertService AlertService
+
+<PageTitle>Users</PageTitle>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between">
+        <h4>Users</h4>
+
+        <UserCreateForm OnSuccess="Refetch" />
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive text-nowrap">
+            <table class="table">
+                <thead>
+                    <tr class="text-nowrap">
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 1;
+                    }
+                    @if (users != null)
+                    {
+                        @foreach (var user in users)
+                        {
+                            <tr>
+                                <th scope="row">@i</th>
+                                <td>@user.Name</td>
+                                <td>@user.Username</td>
+                                <td>@user.Email</td>
+                                <td>
+                                    <button type="button" class="btn btn-icon btn-danger"
+                                @onclick="() => HandleDelete(user)">
+                                        <span class="fas fa-trash"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<Modal @ref="deleteModal">
+    <Title>Delete User</Title>
+
+    <Body>
+        <p>
+            Are you sure to delete this data?
+        </p>
+    </Body>
+
+    <Footer>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+            @onclick="() => deleteModal.Close()">
+            Close
+        </button>
+        <button type="button" class="btn btn-danger" @onclick="DeleteUser">Delete</button>
+    </Footer>
+</Modal>
+
+@code {
+    protected IList<User> users;
+
+    private Modal deleteModal { get; set; }
+    protected User deletedUser;
+
+    protected async void Refetch()
+    {
+        
+        await fetch();
+        StateHasChanged();
+    }
+
+    private async Task fetch()
+    {
+        users = await UserService.GetUsers();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await fetch();
+    }
+
+    protected void HandleDelete(User user)
+    {
+        deletedUser = user;
+        deleteModal.Open();
+    }
+
+    protected async void DeleteUser()
+    {
+        AlertService.Clear();
+        await UserService.DeleteUser(deletedUser.Id);
+        deleteModal.Close();
+        Refetch();
+
+        AlertService.Success("User deleted successfully");
+    }
+}

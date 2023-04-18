@@ -1,0 +1,30 @@
+﻿@inherits LayoutComponentBase
+
+@inject IJSRuntime JSRuntime
+
+<div class="main-wrapper">
+    <Navbar />
+
+    <div class="main-sidebar sidebar-style-2">
+        <Sidebar />
+    </div>
+
+    <main class="main-content">
+        <Alert />
+        @Body
+    </main>
+
+    <Footer />
+</div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/js/stisla.js");
+            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/js/scripts.js");
+            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/js/custom.js");
+        }
+    }
+}

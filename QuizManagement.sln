@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizManagement.Shared", "QuizManagement.Shared\QuizManagement.Shared.csproj", "{11D1384C-9E87-4F13-AF34-A4032F611A13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizManagement.Api", "QuizManagement.Api\QuizManagement.Api.csproj", "{8710563B-5BE1-46F7-A9B3-098033536EC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizManagement.Client", "QuizManagement.Client\QuizManagement.Client.csproj", "{70F92577-13D4-4519-AF3C-5C6E675DAED5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6A0554DB-9644-47B7-B2F5-4DAC0D51F332}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A0554DB-9644-47B7-B2F5-4DAC0D51F332}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A0554DB-9644-47B7-B2F5-4DAC0D51F332}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A0554DB-9644-47B7-B2F5-4DAC0D51F332}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11D1384C-9E87-4F13-AF34-A4032F611A13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11D1384C-9E87-4F13-AF34-A4032F611A13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11D1384C-9E87-4F13-AF34-A4032F611A13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11D1384C-9E87-4F13-AF34-A4032F611A13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8710563B-5BE1-46F7-A9B3-098033536EC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8710563B-5BE1-46F7-A9B3-098033536EC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8710563B-5BE1-46F7-A9B3-098033536EC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8710563B-5BE1-46F7-A9B3-098033536EC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70F92577-13D4-4519-AF3C-5C6E675DAED5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70F92577-13D4-4519-AF3C-5C6E675DAED5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70F92577-13D4-4519-AF3C-5C6E675DAED5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70F92577-13D4-4519-AF3C-5C6E675DAED5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

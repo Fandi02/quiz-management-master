@@ -1,0 +1,7 @@
+version: '3.9'
+services:
+  quizmanagement:
+    image: infamous0192/quiz-management
+    build: .
+    ports:
+      - 8080:80

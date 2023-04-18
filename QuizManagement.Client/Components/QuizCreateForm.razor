@@ -1,0 +1,42 @@
+@inject IAlertService AlertService
+@inject NavigationManager NavigationManager
+@inject IQuizService QuizService
+@inject IUserService UserService
+
+<EditForm Model="@Quiz" OnValidSubmit="@OnValidSubmit">
+    <div class="row mb-3">
+        <label class="col-sm-2 col-form-label" for="quiz-name">Name</label>
+        <div class="col-sm-10">
+            <InputText type="text" id="quiz-name" class="form-control" placeholder="Quiz Name"
+                @bind-Value="Quiz.Name" />
+            <div class="invalid-feedback">
+                <ValidationMessage For="@(() => Quiz.Name)" />
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-end">
+        <button type="submit" class="btn btn-primary">Add</button>
+    </div>
+</EditForm>
+
+@code {
+    protected Quiz Quiz { get; set; } = new Quiz();
+
+    private async void OnValidSubmit()
+    {
+        AlertService.Clear();
+
+        try
+        {
+            await QuizService.AddQuiz(Quiz);
+            AlertService.Success("Quiz created successfully");
+            NavigationManager.NavigateTo($"/quiz/{Quiz.Id}", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            AlertService.Error(ex.ToString());
+            StateHasChanged();
+        }
+    }
+}

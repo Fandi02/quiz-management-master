@@ -1,0 +1,90 @@
+@inject IQuestionService QuestionService
+@inject IQuizService QuizService
+@inject IAlertService AlertService
+
+<button type="button" class="btn btn-sm btn-primary" @onclick="() => modal.Open()">
+    <span class="bx bx-plus"></span> Create new
+</button>
+
+<Modal @ref="modal">
+    <Title>Add Question</Title>
+
+    <Body>
+        <div class="mb-3">
+            <label class="form-label" for="question">Question</label>
+            <InputTextArea id="question" class="form-control" placeholder="Fill question here!"
+                aria-label="Fill question here!" cols="3" @bind-Value="Question.Question"></InputTextArea>
+        </div>
+
+        <hr>
+
+        @{
+            int i = 0;
+        }
+        @foreach (var answer in Question.Answers)
+        {
+            <AnswerForm Index="i" Answer="answer" OnDelete="HandleAnswerDelete" />
+            i++;
+        }
+
+        <div class="d-flex align-items-center justify-content-end">
+            <button type="button" class="btn btn-sm btn-primary" @onclick="AddAnswer">
+                + Add Answer
+            </button>
+        </div>
+    </Body>
+    <Footer>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" @onclick="() => modal.Close()">
+            Close
+        </button>
+        <button type="button" class="btn btn-primary" @onclick="HandleSubmit">Create</button>
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter]
+    public int QuizId { get; set; }
+
+    [Parameter]
+    public EventCallback OnSuccess { get; set; }
+
+    protected Quiz Quiz { get; set; } = new Quiz();
+
+    private Modal modal { get; set; }
+
+    protected QuestionDTO Question { get; set; } = new QuestionDTO
+    {
+        Question = "",
+        Answers = new List<AnswerDTO> { new AnswerDTO(), new AnswerDTO() },
+    };
+
+    protected void AddAnswer()
+    {
+        Question.Answers.Add(new AnswerDTO());
+        StateHasChanged();
+    }
+
+    protected void HandleAnswerDelete(int index)
+    {
+        Question.Answers.RemoveAt(index);
+        StateHasChanged();
+    }
+
+    private async void HandleSubmit()
+    {
+        AlertService.Clear();
+
+        try
+        {
+            modal.Close();
+            Question.QuizId = QuizId;
+            await QuestionService.AddQuestion(Question);
+            await OnSuccess.InvokeAsync();
+            AlertService.Success("Question created successfully");
+        }
+        catch (Exception ex)
+        {
+            AlertService.Error(ex.Message);
+        }
+    }
+}

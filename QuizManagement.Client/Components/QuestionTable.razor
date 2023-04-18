@@ -1,0 +1,150 @@
+@inject IQuestionService QuestionService
+@inject IAlertService AlertService
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Question</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var i = 0;
+            }
+            @foreach (var question in Questions)
+            {
+                <tr>
+                    <th scope="row">@(i+1)</th>
+                    <td>@question.Text</td>
+                    <td class="text-nowrap">
+                        <button class="btn btn-icon btn-primary" @onclick="() => handleUpdate(question)">
+                            <span class="fas fa-edit"></span>
+                        </button>
+                        <button type="button" class="btn btn-icon btn-secondary" data-bs-toggle="modal"
+                        @onclick="() => handleDelete(question)">
+                            <span class="fas fa-trash"></span>
+                        </button>
+                    </td>
+                </tr>
+                i++;
+            }
+        </tbody>
+    </table>
+</div>
+
+<Modal @ref="updateModal">
+    <Title>Update Question</Title>
+
+    <Body>
+        @if (updatedQuestion.Id != null)
+        {
+            <QuestionUpdateForm Question="updatedQuestion" />
+        }
+    </Body>
+
+    <Footer>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+            @onclick="() => updateModal.Close()">
+            Close
+        </button>
+        <button type="button" class="btn btn-primary" @onclick="UpdateQuestion">Update</button>
+    </Footer>
+</Modal>
+
+<Modal @ref="deleteModal">
+    <Title>Delete Question</Title>
+
+    <Body>
+        <p>
+            Are you sure to delete this data?
+        </p>
+    </Body>
+
+    <Footer>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+            @onclick="() => deleteModal.Close()">
+            Close
+        </button>
+        <button type="button" class="btn btn-danger" @onclick="DeleteQuestion">Delete</button>
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter]
+    public ICollection<Question> Questions { get; set; }
+
+    [Parameter]
+    public EventCallback OnStateChange { get; set; }
+
+    private Modal deleteModal { get; set; }
+    private Modal updateModal { get; set; }
+
+    private Question deletedQuestion = new Question();
+    private QuestionDTO updatedQuestion = new QuestionDTO();
+
+    private void handleDelete(Question question)
+    {
+        deletedQuestion = question;
+        deleteModal.Open();
+    }
+
+    private void handleUpdate(Question question)
+    {
+        List<AnswerDTO> answers = new List<AnswerDTO>();
+
+        foreach (var answer in question.Answers)
+        {
+            answers.Add(new AnswerDTO
+            {
+                Answer = answer.Text,
+                Value = answer.Value
+            });
+        }
+
+        updatedQuestion = new QuestionDTO
+        {
+            Id = question.Id,
+            Question = question.Text,
+            Answers = answers,
+            QuizId = question.QuizId,
+        };
+
+        updateModal.Open();
+    }
+
+    private async void DeleteQuestion()
+    {
+        try
+        {
+            deleteModal.Close();
+            await QuestionService.DeleteQuestion(deletedQuestion.Id);
+            AlertService.Success("Question created successfully");
+            await OnStateChange.InvokeAsync();
+        }
+        catch (Exception err)
+        {
+            AlertService.Error(err.Message);
+        }
+    }
+
+    private async void UpdateQuestion()
+    {
+        AlertService.Clear();
+
+        try
+        {
+            @* Console.WriteLine(updatedQuestion.Answers.First().Answer); *@
+            updateModal.Close();
+            await QuestionService.UpdateQuestion(updatedQuestion);
+            await OnStateChange.InvokeAsync();
+            AlertService.Success("Question updated successfully");
+        }
+        catch (Exception ex)
+        {
+            AlertService.Error(ex.Message);
+        }
+    }
+}
