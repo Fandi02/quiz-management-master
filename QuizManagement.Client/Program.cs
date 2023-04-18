@@ -16,7 +16,7 @@ builder.Services.AddScoped<IHttpService, HttpService>();
 builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
 builder.Services.AddScoped(x =>
 {
-    var apiUrl = new Uri("http://localhost:5181");
+    var apiUrl = new Uri("https://queznetappapi.azurewebsites.net/index.html");
     return new HttpClient() { BaseAddress = apiUrl };
 });
 
